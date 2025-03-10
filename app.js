@@ -5,7 +5,6 @@ const jwt = require('jsonwebtoken')
 const multer = require('multer')
 const path = require('path')
 const dotenv = require('dotenv').config()
-const SECRET_KEY = "98E7115AFB814C42B5F4C03F1E6EC7C7F24027856464F133524347841EAFD0F4";
 
 const app = express()
 app.use(express.json())
@@ -80,7 +79,7 @@ app.post('/login', (req, res) => {
             return res.status(401).json({ error: "User not found" });
         }
         if (data[0].password === sifra) {
-            const token = jwt.sign({ id: data[0].id, name: data[0].name, role: data[0].role }, SECRET_KEY, { expiresIn: "1h" })
+            const token = jwt.sign({ id: data[0].id, name: data[0].name, role: data[0].role }, process.env.JWT_KEY , { expiresIn: "1h" })
             res.json({ token });
             // res.status(200).json({ message: "Login successful" });
 
