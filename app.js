@@ -25,10 +25,10 @@ const upload = multer({ storage: storage });
 
 
 const db = mysql.createConnection({
-    host: process.env.DATABASE_HOST,
-    user: process.env.DATABASE_USER, 
-    password: process.env.DATABASE_PASSWORD,
-    database: process.env.DATABASE_NAME
+    host: process.env.MYSQLHOST,
+    user: process.env.MYSQLUSER, 
+    password: process.env.MYSQLPASSWORD,
+    database: process.env.MYSQLDATABASE
   })
 
 db.connect((err) => {
