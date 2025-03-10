@@ -1,11 +1,11 @@
 const express = require('express');
-const mysql = require('mysql2/promise');
+const mysql = require('mysql2');
 const cors = require('cors')
 const jwt = require('jsonwebtoken')
 const multer = require('multer')
 const path = require('path')
 const dotenv = require('dotenv').config()
-const SECRET_KEY = process.env.JWT_KEY;
+const SECRET_KEY = "98E7115AFB814C42B5F4C03F1E6EC7C7F24027856464F133524347841EAFD0F4";
 
 const app = express()
 app.use(express.json())
@@ -23,29 +23,18 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-const url = new URL(process.env.MYSQL_URL);
 
-const pool = mysql.createPool({
-    host: url.hostname,
-    user: url.username,
-    password: url.password,
-    database: url.pathname.substring(1),
-    port: url.port || 3306,
-    waitForConnections: true,
-    connectionLimit: 10, // Limit to avoid overloading
-    queueLimit: 0,
-  });
+const db = mysql.createConnection({
+    host: process.env.DATABASE_HOST,
+    user: process.env.DATABASE_USER, 
+    password: process.env.DATABASE_PASSWORD,
+    database: process.env.DATABASE_NAME
+  })
 
-  (async () => {
-    try {
-      const connection = await pool.getConnection();
-      console.log("Connected to MySQL");
-      connection.release();
-    } catch (error) {
-      console.error("Database connection failed:", error);
-      process.exit(1);
-    }
-  })();
+db.connect((err) => {
+    if(err){return console.log(err)}
+    console.log('Database connected')
+})
 
 app.get('/product-types', (req, res) => {
     db.query("SELECT * FROM product_types", (err, data) => {
