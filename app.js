@@ -8,7 +8,9 @@ const dotenv = require('dotenv').config()
 
 const app = express()
 app.use(express.json())
-app.use(cors())
+app.use(cors({
+    origin: 'https://https://oslikavanje-livno.netlify.app/.netlify.app',  
+  }));
 
 
 const storage = multer.diskStorage({
@@ -40,7 +42,7 @@ db.connect((err) => {
 app.get('/product-types', (req, res) => {
     db.query("SELECT * FROM product_types", (err, data) => {
         if (err) {
-            return res.status(500).json({ error: 'Database error' });
+            return res.status(500).json(err);
           }
           console.log('Query results:', data); 
           if (data.length === 0) {
