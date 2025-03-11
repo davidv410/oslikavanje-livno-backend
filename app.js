@@ -24,30 +24,17 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// RAILWAY BAZA
-const pool = mysql.createPool({
-    host: process.env.MYSQLHOST,
-    user: process.env.MYSQLUSER,
-    password: process.env.MYSQLPASSWORD,
-    database: process.env.MYSQLDATABASE,
-    port: process.env.MYSQLPORT,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
-  });
+const url = `mysql://${process.env.MYSQLUSER}:${process.env.MYSQLPASSWORD}@${process.env.MYSQLHOST}:${process.env.MYSQLPORT}/${process.env.MYSQLDATABASE}`
 
+const db = mysql.createConnection(url)
 
-pool.getConnection((err, connection) => {
-if (err) {
-    console.error('Error connecting to MySQL:', err);
-} else {
-    console.log('Connected to MySQL database!');
-    connection.release();
-}
-});
+db.connect((err) => {
+    if(err){return console.log(err)}
+    console.log('Database connected')
+})
 
 app.get('/product-types', (req, res) => {
-    pool.query("SELECT * FROM product_types", (err, data) => {
+    db.query("SELECT * FROM product_types", (err, data) => {
         if (err) {
             return res.status(500).json(err);
           }
@@ -60,14 +47,14 @@ app.get('/product-types', (req, res) => {
 })
 
 app.get('/products', (req, res) => {
-    pool.query("SELECT * FROM products", (err, data) => {
+    db.query("SELECT * FROM products", (err, data) => {
         res.json(data)
     })
 })
 
 app.post('/remove-products', (req, res) => {
     const { id } = req.body;
-    pool.query("DELETE FROM products WHERE product_id = ?", [id], (err, data) => {
+    db.query("DELETE FROM products WHERE product_id = ?", [id], (err, data) => {
         if(err){
             return (console.log(err))
         }
@@ -79,7 +66,7 @@ app.post('/add-product', upload.single("img"), (req, res) => {
     const { name, desc, type } = req.body
     const filename = req.file.filename
 
-    pool.query("INSERT INTO products (product_name, product_desc, product_img, product_type) VALUES (?,?,?,?)", [name, desc, filename, type], (err, data) => {
+    db.query("INSERT INTO products (product_name, product_desc, product_img, product_type) VALUES (?,?,?,?)", [name, desc, filename, type], (err, data) => {
         if(err){
            return console.log(err)
         }
@@ -89,7 +76,7 @@ app.post('/add-product', upload.single("img"), (req, res) => {
 
 app.post('/login', (req, res) => {
     const { ime, sifra } = req.body 
-    pool.query("SELECT * FROM users WHERE name = ?", [ime], (err, data) => {
+    db.query("SELECT * FROM users WHERE name = ?", [ime], (err, data) => {
         if (err) {
             return res.status(500).json({ error: "Database error" });
         }
