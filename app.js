@@ -24,7 +24,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-const urlDB = `mysql://${process.env.MYSQLUSER}:${process.env.MYSQLPASSWORD}:${process.env.MYSQLHOST}:${process.env.MYSQLHOST}:${process.env.MYSQLPORT}/${process.env.MYSQLDATABASE}`
+const urlDB = `mysql://${process.env.MYSQLUSER}:${process.env.MYSQLPASSWORD}:${process.env.MYSQLHOST}:${process.env.MYSQLHOST}:${process.env.MYSQLPORT}:${process.env.MYSQLDATABASE}`
 
 
 // RAILWAY BAZA
