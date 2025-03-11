@@ -22,13 +22,15 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-
+// RAILWAY BAZA
 const db = mysql.createConnection({
     host: process.env.MYSQLHOST,
     user: process.env.MYSQLUSER, 
     password: process.env.MYSQLPASSWORD,
     database: process.env.MYSQLDATABASE
-  })
+})
+
+
 
 db.connect((err) => {
     if(err){return console.log(err)}
@@ -37,7 +39,14 @@ db.connect((err) => {
 
 app.get('/product-types', (req, res) => {
     db.query("SELECT * FROM product_types", (err, data) => {
-        res.json(data)
+        if (err) {
+            return res.status(500).json({ error: 'Database error' });
+          }
+          console.log('Query results:', data); 
+          if (data.length === 0) {
+            return res.status(404).json({ error: 'No product types found' });
+          }
+          res.json(data); 
     })
 })
 
