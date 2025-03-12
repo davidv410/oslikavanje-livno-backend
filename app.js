@@ -10,6 +10,10 @@ const app = express()
 app.use(express.json())
 app.use(cors())
 
+app.use(cors({
+    origin: [process.env.FRONTEND_DOMAIN, 'http://localhost:5173']
+  }));
+
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb){
@@ -29,8 +33,6 @@ const db = mysql.createConnection({
     password: process.env.MYSQLPASSWORD,
     database: process.env.MYSQLDATABASE
 })
-
-
 
 db.connect((err) => {
     if(err){return console.log(err)}
