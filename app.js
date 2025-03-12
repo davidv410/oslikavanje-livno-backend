@@ -11,7 +11,9 @@ app.use(express.json())
 app.use(cors())
 
 app.use(cors({
-    origin: [process.env.FRONTEND_DOMAIN, 'http://localhost:5173']
+    origin: [process.env.FRONTEND_DOMAIN, 'http://localhost:5173'],
+    methods: 'GET, POST, OPTIONS',
+    allowedHeaders: 'Content-Type, Authorization',
   }));
 
 
@@ -80,7 +82,13 @@ app.post('/add-product', upload.single("img"), (req, res) => {
 })
 
 app.post('/login', (req, res) => {
+
+    res.header("Access-Control-Allow-Origin", "https://oslikavanje-livno.netlify.app");
+    res.header("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
     const { ime, sifra } = req.body 
+
     db.query("SELECT * FROM users WHERE name = ?", [ime], (err, data) => {
         if (err) {
             return res.status(500).json({ error: "Database error" });
