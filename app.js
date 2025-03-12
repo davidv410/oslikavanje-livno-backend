@@ -8,9 +8,7 @@ const dotenv = require('dotenv').config()
 
 const app = express()
 app.use(express.json())
-app.use(cors({
-    origin: 'https://https://oslikavanje-livno.netlify.app/.netlify.app',  
-  }));
+app.use(cors())
 
 
 const storage = multer.diskStorage({
@@ -24,9 +22,15 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-const url = `mysql://${process.env.MYSQLUSER}:${process.env.MYSQLPASSWORD}@${process.env.MYSQLHOST}:${process.env.MYSQLPORT}/${process.env.MYSQLDATABASE}`
+// RAILWAY BAZA
+const db = mysql.createConnection({
+    host: process.env.MYSQLHOST,
+    user: process.env.MYSQLUSER, 
+    password: process.env.MYSQLPASSWORD,
+    database: process.env.MYSQLDATABASE
+})
 
-const db = mysql.createConnection(url)
+
 
 db.connect((err) => {
     if(err){return console.log(err)}
@@ -36,9 +40,8 @@ db.connect((err) => {
 app.get('/product-types', (req, res) => {
     db.query("SELECT * FROM product_types", (err, data) => {
         if (err) {
-            return res.status(500).json(err);
+            return res.status(500).json({ error: 'Database error' });
           }
-          console.log('Query results:', data); 
           if (data.length === 0) {
             return res.status(404).json({ error: 'No product types found' });
           }
