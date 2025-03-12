@@ -42,7 +42,7 @@ db.connect((err) => {
 app.get('/product-types', (req, res) => {
     db.query("SELECT * FROM product_types", (err, data) => {
         if (err) {
-            return res.status(500).json({ error: 'Database error' });
+            return res.status(500).json(err);
           }
           if (data.length === 0) {
             return res.status(404).json({ error: 'No product types found' });
