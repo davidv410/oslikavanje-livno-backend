@@ -12,7 +12,7 @@ app.use(cors())
 
 app.use(cors({
     origin: process.env.FRONTEND_DOMAIN,
-    credentials: true
+    credentials: true,
   }));
 
 
@@ -74,7 +74,7 @@ app.post('/add-product', upload.single("img"), (req, res) => {
 
     db.query("INSERT INTO products (product_name, product_desc, product_img, product_type) VALUES (?,?,?,?)", [name, desc, filename, type], (err, data) => {
         if(err){
-           return console.log(err)
+           return res.json(err)
         }
         res.status(200).json({ message: "Product added successfully!", data: req.body });
     })
