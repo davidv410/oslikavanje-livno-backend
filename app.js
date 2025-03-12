@@ -82,9 +82,6 @@ app.post('/add-product', upload.single("img"), (req, res) => {
 
 app.post('/login', (req, res) => {
 
-    res.header("Access-Control-Allow-Origin", "https://oslikavanje-livno.netlify.app");
-    res.header("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
     const { ime, sifra } = req.body 
 
