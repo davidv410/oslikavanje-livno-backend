@@ -2,10 +2,7 @@ const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors')
 const jwt = require('jsonwebtoken')
-const multer = require('multer')
-const path = require('path')
 const dotenv = require('dotenv').config()
-
 const app = express()
 app.use(express.json())
 app.use(cors())
@@ -15,17 +12,35 @@ app.use(cors({
     credentials: true,
   }));
 
+const admin = require('firebase-admin')
+const { getStorage } = require('firebase-admin/storage')
+const multer = require('multer')
+const path = require('path')
+const fs = require('fs')
 
-const storage = multer.diskStorage({
-    destination: function(req, file, cb){
-        cb(null, "../frontend/oslikavanje-livno/public/proizvodi")
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + path.extname(file.originalname));
-    }
+const serviceAccount = require('./firebase-admin.json')
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    storageBucket: "gs://oslikavanje-livno-img-folder.firebasestorage.app"
 })
 
-const upload = multer({ storage: storage });
+const bucket = getStorage().bucket()
+
+const upload = multer({ dest: 'uploads/' });
+
+const uploadToFirebase = async (filePath, fileName) => {
+    const file = bucket.file(fileName);
+    await bucket.upload(filePath, {
+        destination: fileName,
+        metadata: { contentType: 'image/png' }
+    })
+
+    await file.makePublic(); // Makes the file accessible via URL
+
+    return `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+}
+
 
 // RAILWAY BAZA
 const db = mysql.createConnection({
@@ -68,16 +83,28 @@ app.post('/remove-products', (req, res) => {
     })
 })
 
-app.post('/add-product', upload.single("img"), (req, res) => {
+app.post('/add-product', upload.single('img'), async (req, res) => {
     const { name, desc, type } = req.body
-    const filename = req.file.filename
+    // const filename = req.file.filename
 
-    db.query("INSERT INTO products (product_name, product_desc, product_img, product_type) VALUES (?,?,?,?)", [name, desc, filename, type], (err, data) => {
-        if(err){
-           return res.json(err)
-        }
-        res.status(200).json({ message: "Product added successfully!", data: req.body });
-    })
+    try {
+        const filePath = req.file.path;
+        const fileName = Date.now() + path.extname(req.file.originalname);
+        const imageUrl = await uploadToFirebase(filePath, fileName);
+
+        fs.unlinkSync(filePath); // Delete the temporary file
+
+        db.query("INSERT INTO products (product_name, product_desc, product_img, product_type) VALUES (?,?,?,?)", [name, desc, imageUrl, type], (err, data) => {
+            if(err){
+                return res.status(500).json({ error: "Database error", details: err });
+            }
+            res.status(200).json({ message: "Product added successfully!", data: req.body });
+        })
+
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to upload image', details: error });
+    }
+
 })
 
 app.post('/login', (req, res) => {
