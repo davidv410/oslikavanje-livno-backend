@@ -43,7 +43,7 @@ const uploadToFirebase = async (filePath, fileName) => {
     const file = bucket.file(fileName);
     await bucket.upload(filePath, {
         destination: fileName,
-        metadata: { contentType: 'image/png' }
+        metadata: { contentType: mimetype }
     })
 
     await file.makePublic(); // Makes the file accessible via URL
