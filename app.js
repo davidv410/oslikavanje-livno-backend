@@ -18,7 +18,6 @@ const multer = require('multer')
 const path = require('path')
 const fs = require('fs')
 
-const serviceAccount = require('./firebase-admin.json')
 
 admin.initializeApp({
     credential: admin.credential.cert({
