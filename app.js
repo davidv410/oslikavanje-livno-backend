@@ -26,6 +26,9 @@ app.use('/add-product', addProductRoute)
 const loginRoute = require('./routes/login')
 app.use('/login', loginRoute)
 
+const updateProductRoute = require('./routes/updateProduct')
+app.use('/update-product', updateProductRoute)
+
 app.listen(5000, () => {
     console.log('Server started')
 })

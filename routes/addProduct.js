@@ -1,4 +1,4 @@
-const uploadToFirebase = require('../routes/firebaseStorage')
+const { uploadToFirebase } = require('../routes/firebaseStorage')
 const dbImport = require('../routes/dbConnection')
 const express = require('express')
 const router = express.Router()

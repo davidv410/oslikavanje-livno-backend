@@ -31,4 +31,8 @@ const uploadToFirebase = async (filePath, fileName) => {
     return `https://storage.googleapis.com/${bucket.name}/${fileName}`;
 }
 
-module.exports = uploadToFirebase
+async function deleteFromFirebase(fileName) {
+    await bucket.file(fileName).delete();
+}
+
+module.exports = { uploadToFirebase, deleteFromFirebase }
